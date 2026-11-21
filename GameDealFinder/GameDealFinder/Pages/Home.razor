@@ -35,14 +35,20 @@ else
 {
     @foreach (var deal in deals)
     {
-        <div class="deal">
-            <img src="@deal.Thumb" alt="@deal.Title" width="150" />
+        <a href="https://www.cheapshark.com/redirect?dealID=@deal.DealID"
+           target="_blank"
+           rel="noopener noreferrer">
 
-            <h3>@deal.Title</h3>
-            <p>Sale price: $@deal.SalePrice</p>
-            <p>Normal price: $@deal.NormalPrice</p>
-            <p>Store: @GetStoreName(deal.StoreID)</p>
-        </div>
+            <div class="deal">
+                <img src="@deal.Thumb" alt="@deal.Title" width="150" />
+
+                <h3>@deal.Title</h3>
+                <p>Sale price: $@deal.SalePrice</p>
+                <p>Normal price: $@deal.NormalPrice</p>
+                <p>Store: @GetStoreName(deal.StoreID)</p>
+            </div>
+
+        </a>
     }
 }
 

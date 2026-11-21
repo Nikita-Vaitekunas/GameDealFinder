@@ -1,5 +1,4 @@
-﻿
-namespace GameDealFinder.Models;
+﻿namespace GameDealFinder.Models;
 
 public class Deal
 {
