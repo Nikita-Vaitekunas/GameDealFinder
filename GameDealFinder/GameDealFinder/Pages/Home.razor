@@ -9,7 +9,11 @@
 
 <p>Find the best deals on PC games.</p>
 
-@if (deals == null)
+@if (!string.IsNullOrEmpty(error))
+{
+    <p>Error: @error</p>
+}
+else if (deals == null)
 {
     <p>Loading deals...</p>
 }
@@ -31,21 +35,28 @@ else
 }
 
 @code {
-    private List<Deal> deals = new List<Deal>();
+    private List<Deal>? deals;
     private List<Store> stores = new List<Store>();
+    private string error = "";
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             deals = await Http.GetFromJsonAsync<List<Deal>>(
-                "deals?sortBy=DealRating&pageSize=10") ?? new List<Deal>();
+                "deals?sortBy=DealRating&pageSize=10");
 
             stores = await Http.GetFromJsonAsync<List<Store>>(
                 "stores") ?? new List<Store>();
+
+            if (deals == null)
+            {
+                deals = new List<Deal>();
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            error = ex.Message;
             deals = new List<Deal>();
         }
     }
