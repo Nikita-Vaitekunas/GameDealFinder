@@ -11,7 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Set up HttpClient for the CheapShark API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://www.cheapshark.com/api/1.0/")
+    BaseAddress = new Uri("https://www.cheapshark.com/api/1.0")
 });
 
 await builder.Build().RunAsync();

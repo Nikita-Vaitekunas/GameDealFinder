@@ -1,4 +1,7 @@
 ﻿@page "/"
+@using GameDealFinder.Models
+@using System.Net.Http.Json
+@inject HttpClient Http
 
 <PageTitle>GameDealFinder</PageTitle>
 
@@ -6,7 +9,56 @@
 
 <p>Find the best deals on PC games.</p>
 
-<p>
-    Search for games, compare prices across different stores,
-    and find the best deals available.
-</p>
+@if (deals == null)
+{
+    <p>Loading deals...</p>
+}
+else if (deals.Count == 0)
+{
+    <p>No deals found.</p>
+}
+else
+{
+    @foreach (var deal in deals)
+    {
+        <div class="deal">
+            <h3>@deal.Title</h3>
+            <p>Sale price: $@deal.SalePrice</p>
+            <p>Normal price: $@deal.NormalPrice</p>
+            <p>Store: @GetStoreName(deal.StoreID)</p>
+        </div>
+    }
+}
+
+@code {
+    private List<Deal> deals = new List<Deal>();
+    private List<Store> stores = new List<Store>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            deals = await Http.GetFromJsonAsync<List<Deal>>(
+                "deals?sortBy=DealRating&pageSize=10") ?? new List<Deal>();
+
+            stores = await Http.GetFromJsonAsync<List<Store>>(
+                "stores") ?? new List<Store>();
+        }
+        catch
+        {
+            deals = new List<Deal>();
+        }
+    }
+
+    private string GetStoreName(string storeID)
+    {
+        var store = stores.FirstOrDefault(s => s.storeID == storeID);
+
+        if (store == null)
+        {
+            return "Unknown store";
+        }
+
+        return store.storeName;
+    }
+}
