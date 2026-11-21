@@ -26,6 +26,8 @@ else
     @foreach (var deal in deals)
     {
         <div class="deal">
+            <img src="@deal.Thumb" alt="@deal.Title" width="150" />
+
             <h3>@deal.Title</h3>
             <p>Sale price: $@deal.SalePrice</p>
             <p>Normal price: $@deal.NormalPrice</p>
@@ -34,20 +36,47 @@ else
     }
 }
 
+@if (deals != null && deals.Count > 0)
+{
+    <div>
+        <button @onclick="PreviousPage" disabled="@(currentPage == 0)">
+            Previous
+        </button>
+
+        <span>Page @(currentPage + 1)</span>
+
+        <button @onclick="NextPage">
+            Next
+        </button>
+    </div>
+}
+
 @code {
     private List<Deal>? deals;
     private List<Store> stores = new List<Store>();
     private string error = "";
 
+    private int currentPage = 0;
+    private int pageSize = 30;
+
     protected override async Task OnInitializedAsync()
+    {
+        await LoadDeals();
+    }
+
+    // Load deals for the selected page
+    private async Task LoadDeals()
     {
         try
         {
-            deals = await Http.GetFromJsonAsync<List<Deal>>(
-                "deals?sortBy=DealRating&pageSize=10");
+            error = "";
+            deals = null;
 
-            stores = await Http.GetFromJsonAsync<List<Store>>(
-                "stores") ?? new List<Store>();
+            deals = await Http.GetFromJsonAsync<List<Deal>>(
+                $"deals?sortBy=DealRating&pageSize={pageSize}&pageNumber={currentPage}");
+
+            stores = await Http.GetFromJsonAsync<List<Store>>("stores")
+                ?? new List<Store>();
 
             if (deals == null)
             {
@@ -58,6 +87,23 @@ else
         {
             error = ex.Message;
             deals = new List<Deal>();
+        }
+    }
+
+    // Move to the next page
+    private async Task NextPage()
+    {
+        currentPage++;
+        await LoadDeals();
+    }
+
+    // Move to the previous page
+    private async Task PreviousPage()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+            await LoadDeals();
         }
     }
 
