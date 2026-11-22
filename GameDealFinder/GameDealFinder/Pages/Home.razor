@@ -39,6 +39,11 @@
 
 <button @onclick="ApplyStoreFilter">Apply</button>
 
+@if (deals != null && deals.Count > 0)
+{
+    <p>Showing @deals.Count deals</p>
+}
+
 @if (!string.IsNullOrEmpty(error))
 {
     <p>Error: @error</p>
@@ -88,14 +93,19 @@ else
 
 @if (deals != null && deals.Count > 0)
 {
+    <p>
+        Showing @deals.Count deals on page @(currentPage + 1)
+        of @totalPages pages.
+    </p>
+
     <div>
         <button @onclick="PreviousPage" disabled="@(currentPage == 0)">
             Previous
         </button>
 
-        <span>Page @(currentPage + 1)</span>
+        <span>Page @(currentPage + 1) of @totalPages</span>
 
-        <button @onclick="NextPage">
+        <button @onclick="NextPage" disabled="@(currentPage >= totalPages - 1)">
             Next
         </button>
     </div>
@@ -107,6 +117,7 @@ else
     private string error = "";
 
     private int currentPage = 0;
+    private int totalPages = 0;
     private int pageSize = 30;
 
     private string sortBy = "DealRating";
@@ -135,14 +146,28 @@ else
                 storeFilter = $"&storeID={selectedStore}";
             }
 
-            deals = await Http.GetFromJsonAsync<List<Deal>>($"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}")?? new List<Deal>();
+            var response = await Http.GetAsync(
+                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}");
 
-            stores = await Http.GetFromJsonAsync<List<Store>>("stores")?? new List<Store>();
+            response.EnsureSuccessStatusCode();
+
+            // Get the total number of pages from the API
+            if (response.Headers.TryGetValues("X-Total-Page-Count", out var pageCount))
+            {
+                int.TryParse(pageCount.FirstOrDefault(), out totalPages);
+            }
+
+            deals = await response.Content.ReadFromJsonAsync<List<Deal>>()
+                ?? new List<Deal>();
+
+            stores = await Http.GetFromJsonAsync<List<Store>>("stores")
+                ?? new List<Store>();
         }
         catch (Exception ex)
         {
             error = ex.Message;
             deals = new List<Deal>();
+            totalPages = 0;
         }
     }
 
@@ -189,8 +214,11 @@ else
     // Move to the next page
     private async Task NextPage()
     {
-        currentPage++;
-        await LoadDeals();
+        if (currentPage < totalPages - 1)
+        {
+            currentPage++;
+            await LoadDeals();
+        }
     }
 
     // Move to the previous page
