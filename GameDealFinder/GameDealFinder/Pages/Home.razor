@@ -39,6 +39,8 @@
 
 <button @onclick="ApplyStoreFilter">Apply</button>
 
+<button @onclick="ResetFilters">Reset Filters</button>
+
 @if (deals != null && deals.Count > 0)
 {
     <p>Showing @deals.Count deals</p>
@@ -94,8 +96,7 @@ else
 @if (deals != null && deals.Count > 0)
 {
     <p>
-        Showing @deals.Count deals on page @(currentPage + 1)
-        of @totalPages pages.
+        Showing @deals.Count deals on page @(currentPage + 1) of @totalPages pages.
     </p>
 
     <div>
@@ -147,7 +148,8 @@ else
             }
 
             var response = await Http.GetAsync(
-                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}");
+                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}"
+            );
 
             response.EnsureSuccessStatusCode();
 
@@ -229,6 +231,17 @@ else
             currentPage--;
             await LoadDeals();
         }
+    }
+
+    // Reset all filters
+    private async Task ResetFilters()
+    {
+        searchTitle = "";
+        selectedStore = "";
+        sortBy = "DealRating";
+        currentPage = 0;
+
+        await LoadDeals();
     }
 
     // Find the store name using its ID
