@@ -9,6 +9,13 @@
 
 <p>Find the best deals on PC games.</p>
 
+<h2>Search Games</h2>
+
+<input @bind="searchTitle" placeholder="Enter a game title..." />
+
+<button @onclick="SearchGames">Search</button>
+<button @onclick="ClearSearch">Clear</button>
+
 <h2>Sort Deals</h2>
 
 <select @bind="sortBy">
@@ -75,6 +82,7 @@ else
     private int currentPage = 0;
     private int pageSize = 30;
     private string sortBy = "DealRating";
+    private string searchTitle = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,8 +97,10 @@ else
             error = "";
             deals = null;
 
+            string title = Uri.EscapeDataString(searchTitle);
+
             deals = await Http.GetFromJsonAsync<List<Deal>>(
-                $"deals?sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}");
+                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}");
 
             stores = await Http.GetFromJsonAsync<List<Store>>("stores")
                 ?? new List<Store>();
@@ -105,6 +115,21 @@ else
             error = ex.Message;
             deals = new List<Deal>();
         }
+    }
+
+    // Search for games by title
+    private async Task SearchGames()
+    {
+        currentPage = 0;
+        await LoadDeals();
+    }
+
+    // Clear the search
+    private async Task ClearSearch()
+    {
+        searchTitle = "";
+        currentPage = 0;
+        await LoadDeals();
     }
 
     // Apply the selected sorting option
