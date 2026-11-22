@@ -1,5 +1,4 @@
 ﻿namespace GameDealFinder.Models;
-
 public class Deal
 {
     public string DealID { get; set; }
@@ -9,5 +8,6 @@ public class Deal
     public string SalePrice { get; set; }
     public string NormalPrice { get; set; }
     public string Savings { get; set; }
+    public string? MetacriticScore { get; set; }
     public string Thumb { get; set; }
 }

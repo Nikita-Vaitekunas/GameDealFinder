@@ -63,8 +63,22 @@ else
                 <img src="@deal.Thumb" alt="@deal.Title" width="150" />
 
                 <h3>@deal.Title</h3>
+
                 <p>Sale price: $@deal.SalePrice</p>
                 <p>Normal price: $@deal.NormalPrice</p>
+
+                <p>Discount: @FormatSavings(deal.Savings)</p>
+
+                @if (!string.IsNullOrEmpty(deal.MetacriticScore)
+                    && deal.MetacriticScore != "0")
+                {
+                    <p>Metacritic score: @deal.MetacriticScore/100</p>
+                }
+                else
+                {
+                    <p>Metacritic score: Not available</p>
+                }
+
                 <p>Store: @GetStoreName(deal.StoreID)</p>
             </div>
 
@@ -121,22 +135,26 @@ else
                 storeFilter = $"&storeID={selectedStore}";
             }
 
-            deals = await Http.GetFromJsonAsync<List<Deal>>(
-                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}");
+            deals = await Http.GetFromJsonAsync<List<Deal>>($"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}")?? new List<Deal>();
 
-            stores = await Http.GetFromJsonAsync<List<Store>>("stores")
-                ?? new List<Store>();
-
-            if (deals == null)
-            {
-                deals = new List<Deal>();
-            }
+            stores = await Http.GetFromJsonAsync<List<Store>>("stores")?? new List<Store>();
         }
         catch (Exception ex)
         {
             error = ex.Message;
             deals = new List<Deal>();
         }
+    }
+
+    // Format the discount percentage
+    private string FormatSavings(string savings)
+    {
+        if (double.TryParse(savings, out double percentage))
+        {
+            return $"{Math.Round(percentage)}%";
+        }
+
+        return "Not available";
     }
 
     // Search for games by title
@@ -185,6 +203,7 @@ else
         }
     }
 
+    // Find the store name using its ID
     private string GetStoreName(string storeID)
     {
         var store = stores.FirstOrDefault(s => s.storeID == storeID);
