@@ -26,6 +26,19 @@
 
 <button @onclick="ApplySort">Apply</button>
 
+<h2>Filter by Store</h2>
+
+<select @bind="selectedStore">
+    <option value="">All Stores</option>
+
+    @foreach (var store in stores)
+    {
+        <option value="@store.storeID">@store.storeName</option>
+    }
+</select>
+
+<button @onclick="ApplyStoreFilter">Apply</button>
+
 @if (!string.IsNullOrEmpty(error))
 {
     <p>Error: @error</p>
@@ -81,8 +94,10 @@ else
 
     private int currentPage = 0;
     private int pageSize = 30;
+
     private string sortBy = "DealRating";
     private string searchTitle = "";
+    private string selectedStore = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -99,8 +114,15 @@ else
 
             string title = Uri.EscapeDataString(searchTitle);
 
+            string storeFilter = "";
+
+            if (!string.IsNullOrEmpty(selectedStore))
+            {
+                storeFilter = $"&storeID={selectedStore}";
+            }
+
             deals = await Http.GetFromJsonAsync<List<Deal>>(
-                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}");
+                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}");
 
             stores = await Http.GetFromJsonAsync<List<Store>>("stores")
                 ?? new List<Store>();
@@ -134,6 +156,13 @@ else
 
     // Apply the selected sorting option
     private async Task ApplySort()
+    {
+        currentPage = 0;
+        await LoadDeals();
+    }
+
+    // Apply the selected store filter
+    private async Task ApplyStoreFilter()
     {
         currentPage = 0;
         await LoadDeals();
