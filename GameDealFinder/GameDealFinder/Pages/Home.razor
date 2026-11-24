@@ -79,44 +79,39 @@ else if (deals.Count == 0)
 }
 else
 {
-    @foreach (var deal in deals)
-    {
-        <div class="deal">
+    <div class="deal-grid">
 
-            <a href="https://www.cheapshark.com/redirect?dealID=@deal.DealID"
-               target="_blank"
-               rel="noopener noreferrer">
+        @foreach (var deal in deals)
+        {
+            <div class="deal">
 
-                <img src="@deal.Thumb" alt="@deal.Title" width="150" />
+                <a href="https://www.cheapshark.com/redirect?dealID=@deal.DealID"
+                   target="_blank">
 
-                <h3>@deal.Title</h3>
+                    <img src="@deal.Thumb" alt="@deal.Title" />
 
-                <p>Sale price: $@deal.SalePrice</p>
-                <p>Normal price: $@deal.NormalPrice</p>
+                    <h3>@deal.Title</h3>
 
-                <p>Discount: @FormatSavings(deal.Savings)</p>
+                    <p>Sale price: $@deal.SalePrice</p>
+                    <p>Normal price: $@deal.NormalPrice</p>
+                    <p>Discount: @FormatSavings(deal.Savings)</p>
 
-                @if (!string.IsNullOrEmpty(deal.MetacriticScore)
-                    && deal.MetacriticScore != "0")
+                    @if (!string.IsNullOrEmpty(deal.MetacriticScore)
+                        && deal.MetacriticScore != "0")
+                    {
+                        <p>Metacritic: @deal.MetacriticScore</p>
+                    }
+
+                    <p>Store: @GetStoreName(deal.StoreID)</p>
+
+                </a>
+
+                <button @onclick="() => ShowPriceHistory(deal.GameID, deal.Title)">
+                    Show Price History
+                </button>
+
+                @if (selectedGameTitle == deal.Title)
                 {
-                    <p>Metacritic score: @deal.MetacriticScore/100</p>
-                }
-                else
-                {
-                    <p>Metacritic score: Not available</p>
-                }
-
-                <p>Store: @GetStoreName(deal.StoreID)</p>
-
-            </a>
-
-            <button @onclick="() => ShowPriceHistory(deal.GameID, deal.Title)">
-                Show Price History
-            </button>
-
-            @if (selectedGameTitle == deal.Title)
-            {
-                <div>
                     @if (loadingPriceHistory)
                     {
                         <p>Loading price history...</p>
@@ -130,7 +125,7 @@ else
                         <h4>Price History for @selectedGameTitle</h4>
 
                         <p>
-                            Lowest price ever:
+                            Lowest recorded price:
                             $@priceHistory.CheapestPriceEver.Price
                         </p>
 
@@ -138,14 +133,15 @@ else
                             Date:
                             @DateTimeOffset.FromUnixTimeSeconds(
                                 priceHistory.CheapestPriceEver.Date
-                            ).ToLocalTime().ToString("dd MMM yyyy")
+                            ).ToString("dd MMM yyyy")
                         </p>
                     }
-                </div>
-            }
+                }
 
-        </div>
-    }
+            </div>
+        }
+
+    </div>
 }
 
 @if (deals != null && deals.Count > 0)

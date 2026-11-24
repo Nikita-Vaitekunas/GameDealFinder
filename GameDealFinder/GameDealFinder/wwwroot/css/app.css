@@ -198,3 +198,53 @@ select {
         max-width: 100%;
         margin-bottom: 10px;
     }
+
+    /* Pagination */
+    .deal + p {
+        margin-top: 20px;
+    }
+
+    .content > div {
+        margin-top: 10px;
+    }
+
+    .content > div button {
+        min-width: 100px;
+    }
+
+    .content > div span {
+        margin: 0 10px;
+        color: #eeeeee;
+    }
+
+/* Headings */
+h1 {
+    color: #75aaff;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #8abaff;
+    font-size: 22px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+/* Deal card hover */
+.deal:hover {
+    border-color: #75aaff;
+    background-color: #343d50;
+}
+
+
+/* Deal card grid */
+.deal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 15px;
+}
