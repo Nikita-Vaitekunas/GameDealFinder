@@ -56,6 +56,13 @@
 
 <button @onclick="ApplyDiscountFilter">Apply</button>
 
+<h2>Minimum Metacritic Score</h2>
+
+<input type="number" @bind="minMetacritic" min="0" max="100"
+       placeholder="Minimum score (0-100)..." />
+
+<button @onclick="ApplyMetacriticFilter">Apply</button>
+
 <button @onclick="ResetFilters">Reset Filters</button>
 
 @if (!string.IsNullOrEmpty(error))
@@ -74,11 +81,12 @@ else
 {
     @foreach (var deal in deals)
     {
-        <a href="https://www.cheapshark.com/redirect?dealID=@deal.DealID"
-           target="_blank"
-           rel="noopener noreferrer">
+        <div class="deal">
 
-            <div class="deal">
+            <a href="https://www.cheapshark.com/redirect?dealID=@deal.DealID"
+               target="_blank"
+               rel="noopener noreferrer">
+
                 <img src="@deal.Thumb" alt="@deal.Title" width="150" />
 
                 <h3>@deal.Title</h3>
@@ -99,9 +107,44 @@ else
                 }
 
                 <p>Store: @GetStoreName(deal.StoreID)</p>
-            </div>
 
-        </a>
+            </a>
+
+            <button @onclick="() => ShowPriceHistory(deal.GameID, deal.Title)">
+                Show Price History
+            </button>
+
+            @if (selectedGameTitle == deal.Title)
+            {
+                <div>
+                    @if (loadingPriceHistory)
+                    {
+                        <p>Loading price history...</p>
+                    }
+                    else if (!string.IsNullOrEmpty(priceHistoryError))
+                    {
+                        <p>@priceHistoryError</p>
+                    }
+                    else if (priceHistory?.CheapestPriceEver != null)
+                    {
+                        <h4>Price History for @selectedGameTitle</h4>
+
+                        <p>
+                            Lowest price ever:
+                            $@priceHistory.CheapestPriceEver.Price
+                        </p>
+
+                        <p>
+                            Date:
+                            @DateTimeOffset.FromUnixTimeSeconds(
+                                priceHistory.CheapestPriceEver.Date
+                            ).ToLocalTime().ToString("dd MMM yyyy")
+                        </p>
+                    }
+                </div>
+            }
+
+        </div>
     }
 }
 
@@ -140,6 +183,12 @@ else
     private string minPrice = "";
     private string maxPrice = "";
     private string minDiscount = "";
+    private string minMetacritic = "";
+
+    private GamePriceHistory? priceHistory;
+    private string selectedGameTitle = "";
+    private string priceHistoryError = "";
+    private bool loadingPriceHistory = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -175,8 +224,15 @@ else
                 priceFilter += $"&upperPrice={maxPrice}";
             }
 
+            string metacriticFilter = "";
+
+            if (!string.IsNullOrEmpty(minMetacritic))
+            {
+                metacriticFilter = $"&metacritic={minMetacritic}";
+            }
+
             var response = await Http.GetAsync(
-                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}{priceFilter}"
+                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}{priceFilter}{metacriticFilter}"
             );
 
             response.EnsureSuccessStatusCode();
@@ -308,6 +364,24 @@ else
         await LoadDeals();
     }
 
+    // Apply the minimum Metacritic score
+    private async Task ApplyMetacriticFilter()
+    {
+        if (!string.IsNullOrEmpty(minMetacritic))
+        {
+            if (!int.TryParse(minMetacritic, out int score)
+                || score < 0 || score > 100)
+            {
+                error = "Please enter a Metacritic score between 0 and 100.";
+                return;
+            }
+        }
+
+        error = "";
+        currentPage = 0;
+        await LoadDeals();
+    }
+
     // Move to the next page
     private async Task NextPage()
     {
@@ -336,6 +410,7 @@ else
         minPrice = "";
         maxPrice = "";
         minDiscount = "";
+        minMetacritic = "";
         sortBy = "DealRating";
         currentPage = 0;
         error = "";
@@ -354,5 +429,34 @@ else
         }
 
         return store.storeName;
+    }
+
+    // Load the historical lowest price for a game
+    private async Task ShowPriceHistory(string gameID, string title)
+    {
+        try
+        {
+            loadingPriceHistory = true;
+            priceHistoryError = "";
+            priceHistory = null;
+            selectedGameTitle = title;
+
+            priceHistory = await Http.GetFromJsonAsync<GamePriceHistory>(
+                $"games?id={gameID}"
+            );
+
+            if (priceHistory?.CheapestPriceEver == null)
+            {
+                priceHistoryError = "Price history is not available.";
+            }
+        }
+        catch
+        {
+            priceHistoryError = "Could not load price history.";
+        }
+        finally
+        {
+            loadingPriceHistory = false;
+        }
     }
 }
