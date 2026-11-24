@@ -48,6 +48,14 @@
        placeholder="Maximum price..." />
 
 <button @onclick="ApplyPriceFilter">Apply</button>
+
+<h2>Minimum Discount</h2>
+
+<input type="number" @bind="minDiscount" min="0" max="100"
+       placeholder="Minimum discount (%)..." />
+
+<button @onclick="ApplyDiscountFilter">Apply</button>
+
 <button @onclick="ResetFilters">Reset Filters</button>
 
 @if (!string.IsNullOrEmpty(error))
@@ -131,6 +139,7 @@ else
     private string selectedStore = "";
     private string minPrice = "";
     private string maxPrice = "";
+    private string minDiscount = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -178,8 +187,19 @@ else
                 int.TryParse(pageCount.FirstOrDefault(), out totalPages);
             }
 
-            deals = await response.Content.ReadFromJsonAsync<List<Deal>>()
+            var allDeals = await response.Content.ReadFromJsonAsync<List<Deal>>()
                 ?? new List<Deal>();
+
+            // Filter deals by minimum discount
+            if (!string.IsNullOrEmpty(minDiscount))
+            {
+                allDeals = allDeals.Where(deal =>
+                    double.TryParse(deal.Savings, out double savings)
+                    && savings >= double.Parse(minDiscount)
+                ).ToList();
+            }
+
+            deals = allDeals;
 
             stores = await Http.GetFromJsonAsync<List<Store>>("stores")
                 ?? new List<Store>();
@@ -270,6 +290,24 @@ else
         await LoadDeals();
     }
 
+    // Apply the minimum discount filter
+    private async Task ApplyDiscountFilter()
+    {
+        if (!string.IsNullOrEmpty(minDiscount))
+        {
+            if (!double.TryParse(minDiscount, out double discount)
+                || discount < 0 || discount > 100)
+            {
+                error = "Please enter a discount between 0 and 100.";
+                return;
+            }
+        }
+
+        error = "";
+        currentPage = 0;
+        await LoadDeals();
+    }
+
     // Move to the next page
     private async Task NextPage()
     {
@@ -297,6 +335,7 @@ else
         selectedStore = "";
         minPrice = "";
         maxPrice = "";
+        minDiscount = "";
         sortBy = "DealRating";
         currentPage = 0;
         error = "";
