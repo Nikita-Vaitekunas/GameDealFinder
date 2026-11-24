@@ -39,6 +39,12 @@
 
 <button @onclick="ApplyStoreFilter">Apply</button>
 
+<h2>Maximum Price</h2>
+
+<input type="number" @bind="maxPrice" min="0" placeholder="Enter maximum price..." />
+
+<button @onclick="ApplyPriceFilter">Apply</button>
+
 <button @onclick="ResetFilters">Reset Filters</button>
 
 @if (deals != null && deals.Count > 0)
@@ -124,6 +130,7 @@ else
     private string sortBy = "DealRating";
     private string searchTitle = "";
     private string selectedStore = "";
+    private string maxPrice = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -147,8 +154,15 @@ else
                 storeFilter = $"&storeID={selectedStore}";
             }
 
+            string priceFilter = "";
+
+            if (!string.IsNullOrEmpty(maxPrice))
+            {
+                priceFilter = $"&upperPrice={maxPrice}";
+            }
+
             var response = await Http.GetAsync(
-                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}"
+                $"deals?title={title}&sortBy={sortBy}&pageSize={pageSize}&pageNumber={currentPage}{storeFilter}{priceFilter}"
             );
 
             response.EnsureSuccessStatusCode();
@@ -213,6 +227,23 @@ else
         await LoadDeals();
     }
 
+    // Apply the maximum price filter
+    private async Task ApplyPriceFilter()
+    {
+        if (double.TryParse(maxPrice, out double price))
+        {
+            if (price < 0)
+            {
+                error = "Price cannot be negative.";
+                return;
+            }
+        }
+
+        error = "";
+        currentPage = 0;
+        await LoadDeals();
+    }
+
     // Move to the next page
     private async Task NextPage()
     {
@@ -238,8 +269,10 @@ else
     {
         searchTitle = "";
         selectedStore = "";
+        maxPrice = "";
         sortBy = "DealRating";
         currentPage = 0;
+        error = "";
 
         await LoadDeals();
     }
