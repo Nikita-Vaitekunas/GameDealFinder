@@ -39,18 +39,16 @@
 
 <button @onclick="ApplyStoreFilter">Apply</button>
 
-<h2>Maximum Price</h2>
+<h2>Filter by Price</h2>
 
-<input type="number" @bind="maxPrice" min="0" placeholder="Enter maximum price..." />
+<input type="number" @bind="minPrice" min="0"
+       placeholder="Minimum price..." />
+
+<input type="number" @bind="maxPrice" min="0"
+       placeholder="Maximum price..." />
 
 <button @onclick="ApplyPriceFilter">Apply</button>
-
 <button @onclick="ResetFilters">Reset Filters</button>
-
-@if (deals != null && deals.Count > 0)
-{
-    <p>Showing @deals.Count deals</p>
-}
 
 @if (!string.IsNullOrEmpty(error))
 {
@@ -102,7 +100,8 @@ else
 @if (deals != null && deals.Count > 0)
 {
     <p>
-        Showing @deals.Count deals on page @(currentPage + 1) of @totalPages pages.
+        Showing @deals.Count deals on page @(currentPage + 1)
+        of @totalPages pages.
     </p>
 
     <div>
@@ -130,6 +129,7 @@ else
     private string sortBy = "DealRating";
     private string searchTitle = "";
     private string selectedStore = "";
+    private string minPrice = "";
     private string maxPrice = "";
 
     protected override async Task OnInitializedAsync()
@@ -156,9 +156,14 @@ else
 
             string priceFilter = "";
 
+            if (!string.IsNullOrEmpty(minPrice))
+            {
+                priceFilter += $"&lowerPrice={minPrice}";
+            }
+
             if (!string.IsNullOrEmpty(maxPrice))
             {
-                priceFilter = $"&upperPrice={maxPrice}";
+                priceFilter += $"&upperPrice={maxPrice}";
             }
 
             var response = await Http.GetAsync(
@@ -227,14 +232,35 @@ else
         await LoadDeals();
     }
 
-    // Apply the maximum price filter
+    // Apply the price filters
     private async Task ApplyPriceFilter()
     {
-        if (double.TryParse(maxPrice, out double price))
+        double min = 0;
+        double max = 0;
+
+        if (!string.IsNullOrEmpty(minPrice))
         {
-            if (price < 0)
+            if (!double.TryParse(minPrice, out min) || min < 0)
             {
-                error = "Price cannot be negative.";
+                error = "Please enter a valid minimum price.";
+                return;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(maxPrice))
+        {
+            if (!double.TryParse(maxPrice, out max) || max < 0)
+            {
+                error = "Please enter a valid maximum price.";
+                return;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(minPrice) && !string.IsNullOrEmpty(maxPrice))
+        {
+            if (min > max)
+            {
+                error = "Minimum price cannot be higher than maximum price.";
                 return;
             }
         }
@@ -269,6 +295,7 @@ else
     {
         searchTitle = "";
         selectedStore = "";
+        minPrice = "";
         maxPrice = "";
         sortBy = "DealRating";
         currentPage = 0;
