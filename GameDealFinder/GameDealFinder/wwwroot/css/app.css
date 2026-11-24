@@ -115,3 +115,86 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Main content */
+.content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+/* Search box */
+input {
+    padding: 10px;
+    border: 1px solid #555b6e;
+    border-radius: 5px;
+    background-color: #303747;
+    color: white;
+    margin: 5px;
+}
+
+    input::placeholder {
+        color: #b5bac5;
+    }
+
+/* Buttons */
+button {
+    padding: 10px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3478c8;
+    color: white;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #2862a5;
+    }
+
+    button:disabled {
+        background-color: #555b6e;
+        cursor: not-allowed;
+    }
+
+/* Dropdown menus */
+select {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #555b6e;
+    border-radius: 5px;
+    background-color: #303747;
+    color: white;
+}
+
+    select:focus {
+        
+        outline: 2px solid #3478c8;
+    }
+
+/* Deal cards */
+.deal {
+    display: inline-block;
+    vertical-align: top;
+    width: 280px;
+    margin: 10px;
+    padding: 15px;
+    background-color: #2b3140;
+    border: 1px solid #454d60;
+    border-radius: 8px;
+}
+
+    .deal a {
+        color: #eeeeee;
+        text-decoration: none;
+    }
+
+        .deal a:hover {
+            color: #8abaff;
+        }
+
+    .deal img {
+        display: block;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
