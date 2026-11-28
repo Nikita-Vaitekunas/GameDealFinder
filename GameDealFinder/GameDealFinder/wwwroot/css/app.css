@@ -193,11 +193,14 @@ select {
             color: #8abaff;
         }
 
-    .deal img {
-        display: block;
-        max-width: 100%;
-        margin-bottom: 10px;
-    }
+        .deal img {
+            display: block;
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
 
     /* Pagination */
     .deal + p {
@@ -248,3 +251,45 @@ h3 {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 15px;
 }
+
+
+/* Filter layout */
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+/* Individual filter sections */
+.filter-item {
+    padding: 15px;
+    background-color: #2b3140;
+    border: 1px solid #454d60;
+    border-radius: 8px;
+}
+
+    .filter-item h2 {
+        margin-top: 0;
+        font-size: 18px;
+    }
+
+    .filter-item input,
+    .filter-item select {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+/* Smaller screens */
+@media (max-width: 800px) {
+    .filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 550px) {
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

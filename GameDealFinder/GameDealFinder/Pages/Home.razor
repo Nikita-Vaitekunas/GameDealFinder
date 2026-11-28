@@ -9,59 +9,61 @@
 
 <p>Find the best deals on PC games.</p>
 
-<h2>Search Games</h2>
+<div class="filter-grid">
 
-<input @bind="searchTitle" placeholder="Enter a game title..." />
+    <div class="filter-item">
+        <h2>Search Games</h2>
+        <input @bind="searchTitle" placeholder="Enter a game title..." />
+        <button @onclick="SearchGames">Search</button>
+        <button @onclick="ClearSearch">Clear</button>
+    </div>
 
-<button @onclick="SearchGames">Search</button>
-<button @onclick="ClearSearch">Clear</button>
+    <div class="filter-item">
+        <h2>Sort Deals</h2>
+        <select @bind="sortBy">
+            <option value="DealRating">Best Deal Rating</option>
+            <option value="Price">Cheapest Price</option>
+            <option value="Savings">Biggest Savings</option>
+        </select>
+        <button @onclick="ApplySort">Apply</button>
+    </div>
 
-<h2>Sort Deals</h2>
+    <div class="filter-item">
+        <h2>Store</h2>
+        <select @bind="selectedStore">
+            <option value="">All Stores</option>
+            @foreach (var store in stores)
+            {
+                <option value="@store.storeID">@store.storeName</option>
+            }
+        </select>
+        <button @onclick="ApplyStoreFilter">Apply</button>
+    </div>
 
-<select @bind="sortBy">
-    <option value="DealRating">Best Deal Rating</option>
-    <option value="Price">Cheapest Price</option>
-    <option value="Savings">Biggest Savings</option>
-</select>
+    <div class="filter-item">
+        <h2>Price Range</h2>
+        <input type="number" @bind="minPrice" min="0"
+               placeholder="Minimum price..." />
+        <input type="number" @bind="maxPrice" min="0"
+               placeholder="Maximum price..." />
+        <button @onclick="ApplyPriceFilter">Apply</button>
+    </div>
 
-<button @onclick="ApplySort">Apply</button>
+    <div class="filter-item">
+        <h2>Minimum Discount</h2>
+        <input type="number" @bind="minDiscount" min="0" max="100"
+               placeholder="Discount (%)..." />
+        <button @onclick="ApplyDiscountFilter">Apply</button>
+    </div>
 
-<h2>Filter by Store</h2>
+    <div class="filter-item">
+        <h2>Metacritic Score</h2>
+        <input type="number" @bind="minMetacritic" min="0" max="100"
+               placeholder="Minimum score..." />
+        <button @onclick="ApplyMetacriticFilter">Apply</button>
+    </div>
 
-<select @bind="selectedStore">
-    <option value="">All Stores</option>
-
-    @foreach (var store in stores)
-    {
-        <option value="@store.storeID">@store.storeName</option>
-    }
-</select>
-
-<button @onclick="ApplyStoreFilter">Apply</button>
-
-<h2>Filter by Price</h2>
-
-<input type="number" @bind="minPrice" min="0"
-       placeholder="Minimum price..." />
-
-<input type="number" @bind="maxPrice" min="0"
-       placeholder="Maximum price..." />
-
-<button @onclick="ApplyPriceFilter">Apply</button>
-
-<h2>Minimum Discount</h2>
-
-<input type="number" @bind="minDiscount" min="0" max="100"
-       placeholder="Minimum discount (%)..." />
-
-<button @onclick="ApplyDiscountFilter">Apply</button>
-
-<h2>Minimum Metacritic Score</h2>
-
-<input type="number" @bind="minMetacritic" min="0" max="100"
-       placeholder="Minimum score (0-100)..." />
-
-<button @onclick="ApplyMetacriticFilter">Apply</button>
+</div>
 
 <button @onclick="ResetFilters">Reset Filters</button>
 
@@ -171,7 +173,7 @@ else
 
     private int currentPage = 0;
     private int totalPages = 0;
-    private int pageSize = 30;
+    private int pageSize = 28;
 
     private string sortBy = "DealRating";
     private string searchTitle = "";
