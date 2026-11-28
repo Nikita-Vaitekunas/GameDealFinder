@@ -14,18 +14,18 @@
     <div class="filter-item">
         <h2>Search Games</h2>
         <input id="searchInput" @bind="searchTitle" placeholder="Enter a game title..." />
-        <button @onclick="SearchGames">Search</button>
-        <button @onclick="ClearSearch">Clear</button>
+        <button id="searchButton" @onclick="SearchGames">Search</button>
+        <button id="clearButton" @onclick="ClearSearch">Clear</button>
     </div>
 
     <div class="filter-item">
         <h2>Sort Deals</h2>
-        <select @bind="sortBy">
+        <select id="sortSelect" @bind="sortBy">
             <option value="DealRating">Best Deal Rating</option>
             <option value="Price">Cheapest Price</option>
             <option value="Savings">Biggest Savings</option>
         </select>
-        <button @onclick="ApplySort">Apply</button>
+        <button id="sortButton" @onclick="ApplySort">Apply</button>
     </div>
 
     <div class="filter-item">
@@ -42,11 +42,11 @@
 
     <div class="filter-item">
         <h2>Price Range</h2>
-        <input type="number" @bind="minPrice" min="0"
+        <input id="minPriceInput" type="number" @bind="minPrice" min="0"
                placeholder="Minimum price..." />
-        <input type="number" @bind="maxPrice" min="0"
+        <input id="maxPriceInput" type="number" @bind="maxPrice" min="0"
                placeholder="Maximum price..." />
-        <button @onclick="ApplyPriceFilter">Apply</button>
+        <button id="priceFilterButton" @onclick ="ApplyPriceFilter">Apply</button>
     </div>
 
     <div class="filter-item">
