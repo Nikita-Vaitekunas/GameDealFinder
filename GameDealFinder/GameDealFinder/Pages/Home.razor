@@ -94,9 +94,9 @@ else
 
                     <h3>@deal.Title</h3>
 
-                    <p>Sale price: $@deal.SalePrice</p>
-                    <p>Normal price: $@deal.NormalPrice</p>
-                    <p>Discount: @FormatSavings(deal.Savings)</p>
+                    <p class="sale-price">$@deal.SalePrice</p>
+                    <p class="normal-price">Was $@deal.NormalPrice</p>
+                    <p class="discount">@FormatSavings(deal.Savings) OFF</p>
 
                     @if (!string.IsNullOrEmpty(deal.MetacriticScore)
                         && deal.MetacriticScore != "0")
@@ -173,7 +173,7 @@ else
 
     private int currentPage = 0;
     private int totalPages = 0;
-    private int pageSize = 28;
+    private int pageSize = 20;
 
     private string sortBy = "DealRating";
     private string searchTitle = "";
