@@ -30,14 +30,14 @@
 
     <div class="filter-item">
         <h2>Store</h2>
-        <select @bind="selectedStore">
+        <select id="storeSelect" @bind="selectedStore">
             <option value="">All Stores</option>
             @foreach (var store in stores)
             {
                 <option value="@store.storeID">@store.storeName</option>
             }
         </select>
-        <button @onclick="ApplyStoreFilter">Apply</button>
+        <button id ="storeFilterButton" @onclick ="ApplyStoreFilter">Apply</button>
     </div>
 
     <div class="filter-item">
@@ -51,21 +51,21 @@
 
     <div class="filter-item">
         <h2>Minimum Discount</h2>
-        <input type="number" @bind="minDiscount" min="0" max="100"
+        <input id="discountInput" type="number" @bind="minDiscount" min="0" max="100"
                placeholder="Discount (%)..." />
-        <button @onclick="ApplyDiscountFilter">Apply</button>
+        <button id="discountFilterButton" @onclick="ApplyDiscountFilter">Apply</button>
     </div>
 
     <div class="filter-item">
         <h2>Metacritic Score</h2>
-        <input type="number" @bind="minMetacritic" min="0" max="100"
+        <input id="metacriticInput" type="number" @bind="minMetacritic" min="0" max="100"
                placeholder="Minimum score..." />
-        <button @onclick="ApplyMetacriticFilter">Apply</button>
+        <button id="metacriticFilterButton" @onclick="ApplyMetacriticFilter">Apply</button>
     </div>
 
 </div>
 
-<button @onclick="ResetFilters">Reset Filters</button>
+<button id="resetFiltersButton" @onclick="ResetFilters">Reset Filters</button>
 
 @if (!string.IsNullOrEmpty(error))
 {
