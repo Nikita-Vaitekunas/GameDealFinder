@@ -13,7 +13,7 @@
 
     <div class="filter-item">
         <h2>Search Games</h2>
-        <input @bind="searchTitle" placeholder="Enter a game title..." />
+        <input id="searchInput" @bind="searchTitle" placeholder="Enter a game title..." />
         <button @onclick="SearchGames">Search</button>
         <button @onclick="ClearSearch">Clear</button>
     </div>
