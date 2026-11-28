@@ -1,11 +1,22 @@
-﻿namespace GameDealFinder.Tests
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+
+namespace GameDealFinder.Tests
 {
     [TestClass]
-    public sealed class Test1
+    public class HomePageTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void HomePageLoads()
         {
+            IWebDriver driver = new ChromeDriver();
+
+            driver.Navigate().GoToUrl("https://localhost:7299/");
+
+            Assert.IsTrue(driver.Title.Contains("GameDealFinder"));
+
+            driver.Quit();
         }
     }
 }
